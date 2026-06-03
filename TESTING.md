@@ -1,165 +1,165 @@
-# Como testar o Perfect Dismantling in-game
+# In-Game Testing Guide
 
-Este guia testa se o mod esta carregando e se o desmonte devolve os ingredientes corretos no The Witcher 3 Next-Gen 4.04.
+This guide explains how to test whether Perfect Dismantling is loaded correctly and whether dismantling returns the expected materials in The Witcher 3 Next-Gen 4.04.
 
-## 1. Antes de abrir o jogo
+## 1. Before Launching
 
-1. Confirme que o mod instalado existe em:
+1. Confirm the installed mod exists at:
 
 ```text
 C:\Program Files (x86)\Steam\steamapps\common\The Witcher 3\Mods\modPerfectDismantling
 ```
 
-2. Confirme que dentro dele existem:
+2. Confirm the mod folder contains:
 
 ```text
 content\blob0.bundle
 content\metadata.store
 ```
 
-3. Abra o Witcher Script Merger.
+3. Open Witcher Script Merger.
 
-4. Rode o scan de conflitos.
+4. Run a conflict scan.
 
-5. Se aparecer conflito de scripts, ele provavelmente vem de outro mod, porque Perfect Dismantling 0.1 Alpha nao inclui scripts.
+5. If script conflicts appear, they are probably from another mod because Perfect Dismantling 0.1 Alpha does not include scripts.
 
-6. Se aparecer conflito de bundles/XML/item definitions, anote quais arquivos conflitaram. O mod pode conflitar com outros mods que alteram os mesmos `def_item_*.xml`.
+6. If bundle/XML/item-definition conflicts appear, note which files conflict. Perfect Dismantling can conflict with other mods that override the same `def_item_*.xml` files.
 
-## 2. Primeiro teste: item craftado simples
+## 2. First Test: Simple Crafted Item
 
-Objetivo: confirmar que o mod esta carregando.
+Goal: confirm the mod is loading.
 
-1. Entre no jogo.
+1. Start the game.
 
-2. Va ate um ferreiro ou armeiro.
+2. Go to a blacksmith or armorer.
 
-3. Escolha um item craftado simples, de preferencia uma espada ou armadura que voce consiga fabricar e desmontar facilmente.
+3. Choose a simple crafted item, preferably a sword or armor piece that you can craft and dismantle easily.
 
-4. Antes de craftar, anote os ingredientes exibidos na tela de criacao.
+4. Before crafting, write down the ingredients shown in the crafting screen.
 
-Exemplo:
+Example:
 
 ```text
-Item craftado: Short sword 1_crafted
-Ingredientes na tela de craft:
+Crafted item: Short sword 1_crafted
+Crafting ingredients:
 - 1 Leather squares
 - 2 Iron ingot
 ```
 
-5. Fabrique o item.
+5. Craft the item.
 
-6. Va para a aba de desmonte.
+6. Go to the dismantling tab.
 
-7. Selecione o item fabricado.
+7. Select the crafted item.
 
-8. Compare os itens que o desmonte vai devolver com os ingredientes anotados.
+8. Compare the dismantle output against the ingredients you wrote down.
 
-Resultado esperado: o desmonte deve devolver exatamente os ingredientes diretos da receita.
+Expected result: dismantling should return exactly the direct ingredients from the crafting recipe.
 
-## 3. Teste de Witcher gear com upgrade
+## 3. Witcher Gear Upgrade Test
 
-Objetivo: confirmar a regra de "um passo para tras".
+Goal: confirm the "one step back" rule.
 
-1. Escolha uma peca de equipamento Witcher que usa uma versao anterior como ingrediente.
+1. Choose a Witcher gear piece that uses a previous version as an ingredient.
 
-Exemplo:
+Example:
 
 ```text
 Grandmaster Boots
 ```
 
-2. Na tela de craft, anote a versao base exigida e os materiais adicionais.
+2. In the crafting screen, write down the required base item and additional materials.
 
-Exemplo esperado de log:
+Example test note:
 
 ```text
-Item craftado: Bear Boots 5
-Receita exige:
+Crafted item: Bear Boots 5
+Recipe requires:
 - 1 Bear Boots 4
-- materiais adicionais da receita
+- additional recipe materials
 ```
 
-3. Fabrique ou use uma peca existente desse tier.
+3. Craft the item or use an existing item from that tier.
 
-4. Va para a aba de desmonte.
+4. Go to the dismantling tab.
 
-5. Selecione a peca upgraded.
+5. Select the upgraded item.
 
-Resultado esperado: o desmonte deve devolver a peca anterior, por exemplo `Bear Boots 4`, mais os materiais usados naquele upgrade. Ele nao deve quebrar recursivamente `Bear Boots 4` em todos os tiers anteriores.
+Expected result: dismantling should return the previous-tier item, for example `Bear Boots 4`, plus the materials used for that upgrade step. It should not recursively break `Bear Boots 4` into all earlier tiers.
 
-## 4. Teste com runas, glifos e upgrades encaixados
+## 4. Socketed Rune, Glyph, And Upgrade Test
 
-Objetivo: confirmar que o comportamento nativo do jogo continua funcionando.
+Goal: confirm the game’s native socket-return behavior is preserved.
 
-1. Pegue uma arma ou armadura com slots.
+1. Get a weapon or armor piece with slots.
 
-2. Coloque uma runa, glifo ou upgrade no item.
+2. Insert a rune, glyph, or upgrade into the item.
 
-3. Anote exatamente o que foi colocado.
+3. Write down exactly what was inserted.
 
-Exemplo:
+Example:
 
 ```text
-Item: espada craftada
-Upgrade encaixado:
+Item: crafted sword
+Socketed upgrade:
 - Rune stribog
 ```
 
-4. Va para o desmonte.
+4. Go to dismantling.
 
-5. Selecione esse item.
+5. Select that item.
 
-Resultado esperado: o jogo deve devolver os ingredientes da receita gerada pelo Perfect Dismantling e tambem devolver a runa/glifo/upgrade se o comportamento vanilla ja expuser isso para aquele item.
+Expected result: the game should return the recipe materials generated by Perfect Dismantling and should also return the inserted rune/glyph/upgrade if vanilla dismantling exposes it for that item.
 
-Observacao: a versao 0.1 Alpha nao adiciona script proprio para recuperar upgrades. Ela preserva o fluxo vanilla de `GetItemRecyclingParts`.
+Note: version 0.1 Alpha does not add custom script logic for recovering socketed upgrades. It preserves the vanilla `GetItemRecyclingParts` flow.
 
-## 5. Teste New Game+
+## 5. New Game+ Test
 
-Objetivo: confirmar que os arquivos `items_plus` foram carregados.
+Goal: confirm that `items_plus` files are loaded.
 
-1. Abra um save New Game+.
+1. Open a New Game+ save.
 
-2. Repita o teste de item craftado simples.
+2. Repeat the simple crafted item test.
 
-3. Repita o teste de Witcher gear upgraded.
+3. Repeat the Witcher gear upgrade test.
 
-Resultado esperado: os itens NG+ devem seguir a mesma regra de devolver os ingredientes diretos da receita NG+.
+Expected result: NG+ items should follow the same direct-recipe return rule using the NG+ item definitions.
 
-## 6. Teste DLC
+## 6. DLC Test
 
-Objetivo: confirmar que HoS e Blood and Wine entram no pacote.
+Goal: confirm Hearts of Stone and Blood and Wine item paths are included.
 
-1. Teste pelo menos um item de Hearts of Stone.
+1. Test at least one Hearts of Stone item.
 
-2. Teste pelo menos um item de Blood and Wine.
+2. Test at least one Blood and Wine item.
 
-3. Para Blood and Wine, priorize um item Grandmaster, porque ele e o caso mais importante para a regra de downgrade.
+3. For Blood and Wine, prioritize a Grandmaster item because it is the most important test case for the downgrade rule.
 
-Resultado esperado: itens DLC devem desmontar em seus ingredientes diretos de receita.
+Expected result: DLC items should dismantle into their direct recipe ingredients.
 
-## 7. Casos conhecidos que podem nao bater
+## 7. Known Cases That May Not Match
 
-Estes casos foram pulados de proposito pelo gerador 0.1 Alpha:
+These cases are intentionally skipped by the 0.1 Alpha generator:
 
-- Receitas ambiguas, onde o mesmo item tem mais de uma receita.
-- Receitas que produzem stacks, como bolts/dardos que produzem 20 unidades.
-- Itens novos adicionados por outros mods, a menos que o XML desse mod seja incluido em um fluxo de geracao customizado.
-- Itens vanilla alterados por outro mod podem conflitar se o outro mod sobrescrever o mesmo arquivo XML.
+- Ambiguous recipes where the same item has more than one recipe.
+- Stack-output recipes, such as bolts crafted in batches.
+- New items added by other mods, unless that mod’s XML is included in a custom generation workflow.
+- Vanilla items modified by another mod may conflict if that mod overrides the same XML file.
 
-## 8. Como reportar um problema
+## 8. Reporting A Problem
 
-Ao encontrar um item com desmonte errado, anote:
+When an item has incorrect dismantle output, record:
 
 ```text
-Versao do jogo:
-Lista de mods ativos:
-Item testado:
-Item era vanilla, DLC ou de outro mod?
-Receita exibida na tela de craft:
-Resultado exibido na tela de desmonte:
-O item tinha runa/glifo/upgrade encaixado?
-Save era NG ou NG+?
-Arquivo de conflito apontado pelo Script Merger, se houver:
+Game version:
+Active mod list:
+Tested item:
+Was the item vanilla, DLC, or from another mod?
+Recipe shown in the crafting screen:
+Dismantle output shown in the dismantling screen:
+Did the item have a rune/glyph/upgrade inserted?
+Was the save NG or NG+?
+Conflict file reported by Script Merger, if any:
 ```
 
-Se possivel, inclua screenshot da tela de craft e da tela de desmonte.
+If possible, include screenshots of the crafting screen and dismantling screen.
