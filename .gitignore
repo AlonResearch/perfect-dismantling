@@ -1,5 +1,6 @@
 # Generated mod output
 /dist/
+/analysis/
 target/
 
 # Keep source tree placeholders if present.
