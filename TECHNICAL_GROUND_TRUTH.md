@@ -1,6 +1,6 @@
 # Perfect Dismantling Technical Ground Truth
 
-Version: `0.2 Alpha`
+Version: `0.3 Alpha`
 
 Last updated: `2026-06-03`
 
@@ -15,14 +15,13 @@ The expected behavior is:
 - Use the currently loaded crafting recipe for the item being dismantled.
 - Return that recipe's direct ingredients as the base dismantle output.
 - Append socketed runes, glyphs, runewords, and similar enhancement items after the base output is resolved.
-- Use vanilla recycling when no valid one-output recipe is found and Debug Mode is off.
-- Reject multi-output recipes and use fallback behavior to avoid duplication exploits.
+- Use vanilla recycling fallback for missing, invalid, and multi-output recipes when no Witcher previous-tier safety item is inferred.
 - Preserve the previous-tier item for recognized upgraded Witcher gear.
-- In Debug Mode, block normal missing recipe matches instead of silently falling back. Recognized upgraded Witcher gear can still return the inferred previous-tier safety item.
+- Debug Mode only controls Perfect Dismantling log output. It does not change dismantle behavior.
 
 ## Repository Layout
 
-- `source/modPerfectDismantling/content/scripts/game/components/inventoryComponent.ws`: main runtime hook, recipe resolver, fallback logic, socket return, aggregation, and Witcher gear safety.
+- `source/modPerfectDismantling/content/scripts/game/components/inventoryComponent.ws`: main runtime hook, recipe resolver, recipe-miss fallback logic, socket return, aggregation, and Witcher gear safety.
 - `source/modPerfectDismantling/content/scripts/game/gui/menus/blacksmithMenu.ws`: merchant dismantle action and notification integration.
 - `source/modPerfectDismantling/content/scripts/game/gui/_old/components/guiDisassembleInventoryComponent.ws`: dismantle grid visibility and preview integration.
 - `source/modPerfectDismantling/bin/config/r4game/user_config_matrix/pc/modPerfectDismantling.xml`: in-game config group and toggles.
@@ -32,7 +31,7 @@ The expected behavior is:
 - `scripts/Build-Mod.ps1`: builds `dist/modPerfectDismantling`.
 - `scripts/Install-Mod.ps1`: installs the built mod and game-level mod menu config.
 - `scripts/tools/w3strings-encode/`: Rust helper for compiling CSV localization to `.w3strings`.
-- `VERSION`: release identifier, currently `0.2-alpha`.
+- `VERSION`: release identifier, currently `0.3-alpha`.
 
 ## Runtime Entry Points
 
@@ -46,7 +45,7 @@ The vanilla dismantle path has been routed through:
 parts = PerfectDismantling_GetDismantlingParts(id);
 ```
 
-If the returned part list is empty, the item is not removed. This is important for Debug Mode strict failures and failed safety cases.
+If the returned part list is empty, the item is not removed. This is important for items with no recipe, no vanilla recycling parts, no socketed upgrades, and no inferred safety output.
 
 When parts exist:
 
@@ -67,13 +66,11 @@ Current flow:
 1. Validate the unique item ID and internal item name.
 2. If `PD_Enabled` is true, try recipe-routed dismantling through `PerfectDismantling_TryResolveRecipeParts(...)`.
 3. If a valid recipe is resolved, use recipe ingredients as base output.
-4. If the recipe is missing or invalid and Debug Mode is on, return only the inferred Witcher previous-tier safety item when available. Otherwise return an empty list.
-5. If the recipe is missing or invalid and Debug Mode is off, copy vanilla `GetItemRecyclingParts(id)` output.
-6. If the mod is disabled, copy vanilla `GetItemRecyclingParts(id)` output.
-7. After any base output path, call `PerfectDismantling_EnsurePreviousWitcherTier(...)` where applicable.
-8. Append enhancement items from `GetItemEnhancementItems(id, upgrades)`.
-9. Aggregate duplicate returned part names.
-10. Return the final part list.
+4. If the recipe is missing or invalid, return only the inferred Witcher previous-tier safety item when available. Otherwise copy vanilla `GetItemRecyclingParts(id)` output.
+5. If the mod is disabled, copy vanilla `GetItemRecyclingParts(id)` output.
+6. Append enhancement items from `GetItemEnhancementItems(id, upgrades)`.
+7. Aggregate duplicate returned part names.
+8. Return the final part list.
 
 ## Config
 
@@ -138,19 +135,21 @@ A recipe is accepted only when:
 - at least one valid ingredient is found
 - every returned ingredient has a valid item name and positive quantity
 
-If `craftedItemQuantity != 1`, the resolver rejects the recipe and the caller follows fallback behavior.
+If `craftedItemQuantity != 1`, the resolver rejects the recipe and the caller follows recipe-miss behavior.
 
 Returned recipe parts are stacked through `PerfectDismantling_AddOrStackPart(...)`.
 
-## Fallback Behavior
+## Recipe Miss Behavior
 
-Fallback depends on settings:
+Recipe misses are independent of Debug Mode:
 
-- Mod enabled, Debug Mode off: use vanilla `GetItemRecyclingParts(id)` when no valid one-output recipe resolves.
-- Mod enabled, Debug Mode on: block normal fallback by returning an empty list, which prevents item removal in `RecycleItem(...)`.
+- Mod enabled: return the inferred previous-tier safety item for recognized upgraded Witcher gear when available.
+- Mod enabled: otherwise use vanilla `GetItemRecyclingParts(id)` and stack those parts into the returned output.
 - Mod disabled: use vanilla `GetItemRecyclingParts(id)`.
 
-Recognized upgraded Witcher gear is the safety exception. If the mod can infer a previous-tier item, that item may still be returned even when Debug Mode blocks normal fallback.
+Recognized upgraded Witcher gear is the safety exception. If the mod can infer a previous-tier item, that item may still be returned on a recipe miss.
+
+If the final output is still empty after fallback and socketed-upgrade return, `RecycleItem(...)` prevents item removal.
 
 ## Witcher Gear Safety
 
@@ -189,7 +188,7 @@ The safety path is intentionally narrow and uses internal names rather than loca
 
 ## Socketed Upgrade Return
 
-After recipe or fallback output is selected, the mod calls:
+After recipe, recipe-miss safety, recipe-miss vanilla fallback, or disabled-mod fallback output is selected, the mod calls:
 
 ```witcherscript
 GetItemEnhancementItems(id, upgrades);
@@ -229,7 +228,7 @@ File: `guiDisassembleInventoryComponent.ws`
 
 `ShouldShowItem(...)` keeps vanilla visibility behavior first by checking `GetItemRecyclingParts(item)`. If vanilla parts are empty, it checks `PerfectDismantling_GetDismantlingParts(item)`.
 
-This means Debug Mode does not hide normal vanilla-dismantlable items from the grid. It can still block the action path when the selected item has no valid recipe or Witcher safety output.
+This means Debug Mode does not hide normal vanilla-dismantlable items from the grid. The selected action path remains the same whether Debug Mode is on or off.
 
 `addRecyclingPartsList(...)` uses `PerfectDismantling_GetDismantlingParts(item)` for preview data and sets both `quantity` and `reqQuantity` to the returned quantity.
 
@@ -272,20 +271,20 @@ The install script:
 
 ## Release State
 
-`0.2 Alpha` is the first script-based release. The active build no longer uses the old generated XML override workflow from `0.1 Alpha`.
+`0.3 Alpha` is the current script-based release with hybrid dismantling: recipe-backed items use direct recipe ingredients, while recipe misses fall back to vanilla recycling parts when available. The active build no longer uses the old generated XML override workflow from `0.1 Alpha`.
 
 Publishing checklist:
 
-- `VERSION` is `0.2-alpha`.
+- `VERSION` is `0.3-alpha`.
 - README is player focused.
-- Changelog has a `0.2 Alpha` section.
+- Changelog has a `0.3 Alpha` section.
 - Technical implementation is documented here.
 - Testing checklist is updated for the script implementation.
 - Build output should include loose scripts, mod menu config, CSV localization, and generated `.w3strings`.
 
 ## Known Limits
 
-- Multi-output recipes are rejected and fall back when fallback is allowed.
+- Multi-output recipes use vanilla recycling fallback when available.
 - If two loaded recipes craft the exact same item, the first matching loaded recipe wins.
 - Mods that change crafting only through script logic may not be visible to this resolver.
 - Alias bridging is currently focused on live `NGP ...` item names whose loaded recipe still uses the unprefixed item name.

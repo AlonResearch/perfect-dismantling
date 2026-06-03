@@ -1,6 +1,6 @@
 # In-Game Testing Guide
 
-This guide validates Perfect Dismantling `0.2 Alpha`.
+This guide validates Perfect Dismantling `0.3 Alpha`.
 
 ## 1. Install Check
 
@@ -116,7 +116,7 @@ Goal: confirm inserted upgrades are preserved.
 2. Insert known runes or glyphs.
 3. Dismantle the item.
 
-Expected result: returned parts include the recipe or fallback output plus each inserted upgrade once.
+Expected result: returned parts include the resolved dismantle output plus each inserted upgrade once.
 
 ## 6. Modded Recipe
 
@@ -129,47 +129,51 @@ Goal: confirm compatibility with recipe-changing mods.
 
 Expected result: dismantling follows the recipe currently shown by the crafting screen.
 
-## 7. Vanilla Fallback
+## 7. Recipe Miss Vanilla Fallback
 
-Goal: confirm unsupported items still dismantle normally during regular play.
+Goal: confirm recipe-less vanilla-dismantlable items still return vanilla recycling parts while Perfect Dismantling is enabled.
 
-1. Make sure Debug Mode is off.
-2. Pick a junk item, monster part, or other item with no one-output crafting recipe.
-3. Dismantle it.
+1. Make sure Perfect Dismantling is enabled.
+2. Pick an item with no one-output crafting recipe but known vanilla recycling parts, such as Zireael armor, Princess Xenthia's Sword, or Mace.
+3. Insert a rune or glyph first when the item has sockets.
+4. Dismantle it.
 
-Expected result: the item uses vanilla dismantling output.
+Expected result: the item is removed, vanilla recycling parts are added, inserted upgrades are returned, and no "No dismantling output was found" notification appears.
+
+With Debug Mode enabled, the log should include a recipe miss message that says the vanilla recycling fallback was used. Items with no recipe, no vanilla recycling parts, no socketed upgrades, and no inferred Witcher safety output should still remain blocked by empty output.
 
 ## 8. Multi-Output Recipe Fallback
 
-Goal: confirm stack-output recipes do not duplicate materials.
+Goal: confirm stack-output recipes do not duplicate recipe materials.
 
 1. Pick a recipe that creates multiple items, such as bolts.
 2. Craft or obtain that item.
-3. Dismantle it with Debug Mode off.
+3. Dismantle it.
 
-Expected result: the recipe is rejected by Perfect Dismantling and vanilla dismantling is used.
+Expected result: the recipe is rejected by Perfect Dismantling and the item uses vanilla recycling fallback when available. The dismantle output should not duplicate the recipe's stack-output ingredients.
 
-## 9. Debug Mode Strict Miss
+## 9. Debug Toggle Parity
 
-Goal: confirm Debug Mode blocks silent recipe misses.
+Goal: confirm Debug Mode only changes Perfect Dismantling log output.
 
-1. Enable Debug Mode in the Perfect Dismantling mod menu.
-2. Pick a normal non-Witcher item with no valid one-output recipe match.
+1. Disable Debug Mode in the Perfect Dismantling mod menu.
+2. Pick a normal non-Witcher item with no valid one-output recipe match and vanilla recycling parts.
 3. Try to dismantle it.
+4. Enable Debug Mode and repeat the same test.
 
-Expected result: the item is not removed, a denied sound plays in the blacksmith menu, and the notification reports that no dismantling output was found.
+Expected result: preview, toast, item removal, and returned items are the same in both runs. With Debug Mode enabled, Perfect Dismantling debug logs are also written.
 
-The item should still appear in the dismantle grid if vanilla dismantling would normally allow it. Debug Mode blocks the action path, not the visibility filter.
+The item may still appear in the dismantle grid if vanilla dismantling would normally allow it. The selected action path should remain identical across the debug toggle.
 
-## 10. Debug Mode Witcher Safety
+## 10. Witcher Safety Recipe Miss
 
-Goal: confirm recognized upgraded Witcher gear remains protected even when strict fallback is active.
+Goal: confirm recognized upgraded Witcher gear remains protected when recipe data is missing or invalid.
 
-1. Enable Debug Mode.
+1. Test with Debug Mode off and then on.
 2. Test a recognized upgraded Witcher item whose recipe is missing, invalid, or temporarily altered.
 3. Dismantle it.
 
-Expected result: the inferred previous-tier item is returned. If the valid recipe or fallback output already includes that previous-tier item, it appears only once.
+Expected result: the inferred previous-tier item is returned in both runs. If the valid recipe already includes that previous-tier item, it appears only once.
 
 Regression case:
 

@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3 Alpha - 2026-06-03
+
+- Changed `Debug Mode` so it only controls Perfect Dismantling debug logs.
+- Recipe misses now behave the same whether Debug Mode is on or off: recognized upgraded Witcher gear can still return its inferred previous-tier safety item, and other unresolved items use vanilla recycling parts when available.
+- Enabled the vanilla recycling fallback for recipe-less items while keeping preview, toast, and action behavior consistent across the debug toggle.
+- Rebuilt the loose-script mod and installed the latest build for local testing.
+
+## 0.21 Alpha - 2026-06-03
+
+- Changed `Debug Mode` so it only controls Perfect Dismantling debug logs.
+- Recipe misses behaved the same whether Debug Mode was on or off: recognized upgraded Witcher gear could still return its inferred previous-tier safety item, and other unresolved items were not dismantled.
+- Removed the enabled-mod debug-off vanilla fallback path from recipe-miss handling so preview, toast, and action behavior stayed consistent across the debug toggle.
+- Rebuilt the loose-script mod and installed the latest build for local testing.
+
 ## 0.2 Alpha - 2026-06-03
 
 - Refactored Perfect Dismantling into a WitcherScript mod.

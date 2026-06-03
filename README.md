@@ -1,6 +1,6 @@
 # Perfect Dismantling
 
-Version: `0.2 Alpha`
+Version: `0.3 Alpha`
 
 Perfect Dismantling is a Witcher 3 Next-Gen 4.04 mod that makes crafted items dismantle back into the materials used to craft them.
 
@@ -12,8 +12,8 @@ Instead of using the game's separate static recycling tables for crafted equipme
 - Recipe changes from other mods can be respected when they are present in the loaded `crafting_schematics` definitions.
 - Socketed runes, glyphs, runewords, and similar upgrades are returned.
 - Upgraded Witcher gear keeps the previous-tier item when the item is recognized.
-- Non-crafted or unsupported items keep vanilla dismantling behavior when Debug Mode is off.
-- Multi-output recipes, such as bolts, stay on vanilla dismantling to avoid material duplication.
+- Items without a valid one-output recipe fall back to vanilla recycling parts, except recognized upgraded Witcher gear can still return its inferred previous-tier safety item.
+- Multi-output recipes, such as bolts, use the fallback path to avoid duplicating recipe outputs.
 - The dismantle preview, result notification, and actual returned items use the same reward list.
 
 ## Requirements
@@ -78,9 +78,9 @@ Options -> Mods -> Perfect Dismantling
 Options:
 
 - `Enable Perfect Dismantling`: turns the recipe-routed dismantling behavior on or off.
-- `Debug Mode`: strict testing mode. Missing recipe matches block normal dismantling instead of falling back, while recognized upgraded Witcher gear can still return its inferred previous-tier safety item.
+- `Debug Mode`: controls Perfect Dismantling debug log output only. It does not change dismantle behavior.
 
-Leave Debug Mode off for normal play.
+Leave Debug Mode off for normal play unless you need troubleshooting logs.
 
 ## What To Test
 
@@ -106,9 +106,9 @@ Because this mod edits common script files, conflicts are expected in larger mod
 
 ## Known Limits
 
-- Recipes that output more than one item use vanilla dismantling.
+- Recipes that output more than one item use vanilla recycling fallback when available.
 - If multiple loaded recipes craft the same item, the first matching loaded recipe is used.
-- Debug Mode is meant for testing and can block normal fallback dismantling.
+- Debug Mode only controls Perfect Dismantling debug logs.
 - The mod is built and documented for The Witcher 3 Next-Gen 4.04.
 
 ## Known Bugs
@@ -118,4 +118,4 @@ Because this mod edits common script files, conflicts are expected in larger mod
 
 ## For Modders
 
-The current implementation details are recorded in [TECHNICAL_GROUND_TRUTH.md](TECHNICAL_GROUND_TRUTH.md). That file is the source of truth for the `0.2 Alpha` script implementation.
+The current implementation details are recorded in [TECHNICAL_GROUND_TRUTH.md](TECHNICAL_GROUND_TRUTH.md). That file is the source of truth for the `0.3 Alpha` script implementation.

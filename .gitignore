@@ -1,5 +1,6 @@
 # Generated mod output
 /dist/
+/release/
 /analysis/
 target/
 
