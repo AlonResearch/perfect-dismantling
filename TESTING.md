@@ -14,22 +14,28 @@ Confirm it contains the loose script:
 
 ```text
 content\scripts\game\components\inventoryComponent.ws
-content\scripts\game\player\playerWitcher.ws
 content\scripts\game\gui\menus\blacksmithMenu.ws
 content\scripts\game\gui\_old\components\guiDisassembleInventoryComponent.ws
+```
+
+Confirm the installed game config contains:
+
+```text
+bin\config\r4game\user_config_matrix\pc\modPerfectDismantling.xml
 ```
 
 Then:
 
 1. Open Witcher Script Merger.
 2. Run a conflict scan.
-3. Merge the `playerWitcher.ws` conflict.
+3. Merge any conflicts in the inventory, blacksmith, or disassemble UI scripts.
 4. In the merged files, confirm the Perfect Dismantling hooks are present:
 
 ```witcherscript
 PerfectDismantling_GetDismantlingParts
 PerfectDismantling_GetCraftingParts
 PerfectDismantling_AddOrStackPart
+PerfectDismantling_ApplyWitcherTierFallback
 ```
 
 ## 2. Simple Crafted Item Test
@@ -73,7 +79,7 @@ Example:
 Mastercrafted Feline Steel Sword
 ```
 
-should return the lower Feline steel sword tier if that lower tier is listed as a recipe ingredient.
+should return the lower Feline steel sword tier. The script also has a fallback for known tiered Witcher gear families that injects the previous-tier item when recipe data omits it.
 
 ## 4. Socketed Rune And Glyph Test
 
@@ -106,14 +112,33 @@ Goal: confirm non-crafted items still dismantle normally.
 
 Expected result: it should use the normal vanilla dismantle output.
 
-## 7. Known Limits
+## 7. Debug Mode Strict Test
+
+Goal: confirm strict testing prevents accidental item destruction when no recipe match exists.
+
+1. Enable Debug Mode in the Perfect Dismantling in-game mod menu.
+2. Pick an item with no one-output crafting recipe match.
+3. Try to dismantle it.
+
+Expected result: the item should not be removed, a denied sound should play in the blacksmith menu, and the notification should report a strict test failure.
+
+## 8. Build Output Check
+
+Goal: confirm localization and menu config are packaged.
+
+1. Run `.\scripts\Build-Mod.ps1`.
+2. Inspect `dist\modPerfectDismantling`.
+
+Expected result: the dist mod should include loose scripts, `bin\config\r4game\user_config_matrix\pc\modPerfectDismantling.xml`, `content\en.csv`, and `content\en.w3strings`.
+
+## 9. Known Limits
 
 - Recipes that output multiple items fall back to vanilla dismantling.
 - If two different recipes craft the exact same item, the script uses the first matching loaded recipe.
 - If another mod changes crafting through code instead of `crafting_schematics`, this mod may not see that change.
 - The game UI preview may require re-entering the dismantle tab after a merge or script change.
 
-## 8. Reporting A Problem
+## 10. Reporting A Problem
 
 When an item has incorrect dismantle output, record:
 
@@ -125,6 +150,7 @@ Was the item vanilla, DLC, or from another mod?
 Recipe shown in the crafting screen:
 Dismantle output shown in the dismantling screen:
 Did the item have a rune/glyph/upgrade inserted?
+Were Perfect Dismantling and Debug Mode enabled in the mod menu?
 Was the save NG or NG+?
 Script Merger conflict result:
 ```
