@@ -1,5 +1,6 @@
 # Generated mod output
 /dist/
+target/
 
 # Keep source tree placeholders if present.
 !/source/**/content/.gitkeep
