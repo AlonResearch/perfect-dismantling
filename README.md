@@ -56,6 +56,8 @@ Install it into your game:
 .\scripts\Install-Mod.ps1
 ```
 
+You can also install the built mod with [The Witcher 3 Mod Manager](https://github.com/Systemcluster/The-Witcher-3-Mod-manager) if that is how you manage your load order.
+
 The install script also installs the mod menu config into the game's `bin\config\r4game\user_config_matrix\pc` folder and adds it to the DX11/DX12 file lists.
 
 Then open Witcher Script Merger, scan conflicts, and merge script conflicts. Keep the `PerfectDismantling_*` helper functions and `RecycleItem()` changes in `inventoryComponent.ws`, plus the `_inv.PerfectDismantling_GetDismantlingParts(...)` calls in the blacksmith and disassemble UI scripts.
