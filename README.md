@@ -111,6 +111,11 @@ Because this mod edits common script files, conflicts are expected in larger mod
 - Debug Mode is meant for testing and can block normal fallback dismantling.
 - The mod is built and documented for The Witcher 3 Next-Gen 4.04.
 
+## Known Bugs
+
+- Dismantle preview UI can leave the socketed item display on the right visible after an item is dismantled.
+- Opening the dismantle screen can stutter because recipe data is gathered at runtime. Investigate compiling or caching the recipe list when the game loads instead of rebuilding it when the dismantle screen opens.
+
 ## For Modders
 
 The current implementation details are recorded in [TECHNICAL_GROUND_TRUTH.md](TECHNICAL_GROUND_TRUTH.md). That file is the source of truth for the `0.2 Alpha` script implementation.
