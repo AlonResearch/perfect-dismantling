@@ -77,6 +77,8 @@ Edit the relevant `gameplay/items/def_item_*.xml` files for normal New Game, and
 
 8. Run Witcher Script Merger after installing. XML-only mods usually avoid script compilation conflicts, but bundled XML conflicts can still happen if another mod overrides the same item XML.
 
+For in-game validation steps, see [TESTING.md](TESTING.md).
+
 ## Important Compatibility Notes
 
 - This workspace uses the installed Steam Next-Gen game at `C:\Program Files (x86)\Steam\steamapps\common\The Witcher 3`.
