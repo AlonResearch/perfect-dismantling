@@ -1,8 +1,9 @@
 # Changelog
 
-## 0.2 Alpha
+## 0.2 Alpha - 2026-06-03
 
 - Refactored Perfect Dismantling into a WitcherScript mod.
+- Prepared the project for the `0.2 Alpha` release with player-focused README, updated testing docs, and a technical ground-truth document.
 - Merchant dismantling now reads the currently loaded `crafting_schematics` definitions at runtime.
 - Recipe lookup now uses a dedicated loaded-recipe resolver that parses matched schematic nodes with `W3CraftingManager.LoadSchematicsXMLData(...)`-equivalent fields instead of the legacy raw ingredient helper.
 - Crafted one-output items dismantle into their direct crafting ingredients.
