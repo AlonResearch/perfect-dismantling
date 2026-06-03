@@ -4,14 +4,18 @@
 
 - Refactored Perfect Dismantling into a WitcherScript mod.
 - Merchant dismantling now reads the currently loaded `crafting_schematics` definitions at runtime.
+- Recipe lookup now uses a dedicated loaded-recipe resolver that parses matched schematic nodes with `W3CraftingManager.LoadSchematicsXMLData(...)`-equivalent fields instead of the legacy raw ingredient helper.
 - Crafted one-output items dismantle into their direct crafting ingredients.
-- Upgraded Witcher gear preserves the previous-tier item, including a fallback for known tiered gear when recipe data omits it.
+- Multi-output recipes explicitly stay on the vanilla fallback path to avoid duplicating recipe outputs.
+- Upgraded Witcher gear preserves the previous-tier item, including a safety injection for known tiered gear when recipe data or fallback output omits it.
 - Socketed runes, glyphs, and enhancement items are returned from the dismantled item's enhancement list.
+- Returned parts are aggregated by internal item name for preview and result notifications.
 - Dismantle menu previews and result notifications now use the same reward list as the actual dismantle action.
 - Dismantle menu previews show returned resource quantities on the item icons.
 - Items without a one-output crafting recipe fall back to vanilla dismantling.
 - Added an in-game mod menu with enable and debug toggles.
-- Debug Mode treats missing recipe matches as strict test failures and prevents item removal.
+- Debug Mode treats normal missing recipe matches as strict test failures and prevents item removal, while still allowing recognized upgraded Witcher gear to return its inferred previous-tier safety item.
+- Debug Mode keeps normal vanilla-dismantlable items visible in the dismantle grid so recipe misses can be inspected instead of disappearing from the menu.
 - Build output now packages menu config files and compiles CSV localization into `.w3strings`.
 - Removed the old generated XML override approach from the active build.
 
