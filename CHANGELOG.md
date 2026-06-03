@@ -7,7 +7,7 @@
 - Crafted one-output items dismantle into their direct crafting ingredients.
 - Socketed runes, glyphs, and enhancement items are returned from the dismantled item's enhancement list.
 - Dismantle menu previews and result notifications now use the same reward list as the actual dismantle action.
-- Dismantle menu previews now show returned resource quantities directly in the item labels.
+- Dismantle menu previews show returned resource quantities on the item icons.
 - Items without a one-output crafting recipe fall back to vanilla dismantling.
 - Removed the old generated XML override approach from the active build.
 
