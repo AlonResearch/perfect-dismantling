@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserConfig>
+	<Group id="PerfectDismantling" displayName="Mods.PerfectDismantling">
+		<PresetsArray>
+			<Preset id="0" displayName="PD_Default">
+				<Entry varId="PD_Enabled" value="true"/>
+				<Entry varId="PD_Debug" value="false"/>
+			</Preset>
+		</PresetsArray>
+		<VisibleVars>
+			<Var id="PD_Enabled" displayName="PD_Enabled" displayType="TOGGLE"/>
+			<Var id="PD_Debug" displayName="PD_Debug" displayType="TOGGLE"/>
+		</VisibleVars>
+	</Group>
+</UserConfig>

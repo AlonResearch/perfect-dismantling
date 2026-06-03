@@ -7,8 +7,10 @@ param(
 $ErrorActionPreference = "Stop"
 
 $sourceContent = Join-Path $ProjectRoot "source\$ModName\content"
+$sourceBin = Join-Path $ProjectRoot "source\$ModName\bin"
 $distMod = Join-Path $ProjectRoot "dist\$ModName"
 $distContent = Join-Path $distMod "content"
+$distBin = Join-Path $distMod "bin"
 $wccDir = Split-Path $WccPath -Parent
 $wccExe = Split-Path $WccPath -Leaf
 
@@ -25,14 +27,33 @@ if (Test-Path $distMod) {
     Remove-Item -LiteralPath $distMod -Recurse -Force
 }
 New-Item -ItemType Directory -Force -Path $distContent | Out-Null
+if (Test-Path $sourceBin) {
+    New-Item -ItemType Directory -Force -Path $distBin | Out-Null
+    Copy-Item -Path (Join-Path $sourceBin "*") -Destination $distBin -Recurse -Force
+}
 
 $scriptSource = Join-Path $sourceContent "scripts"
 if (Test-Path $scriptSource) {
     Copy-Item -LiteralPath $scriptSource -Destination $distContent -Recurse -Force
 }
 
+$localizationCsvFiles = Get-ChildItem -LiteralPath $sourceContent -File -Filter "*.csv"
+foreach ($csvFile in $localizationCsvFiles) {
+    Copy-Item -LiteralPath $csvFile.FullName -Destination $distContent -Force
+
+    $stringsOutput = Join-Path $distContent ($csvFile.BaseName + ".w3strings")
+    $encoderManifest = Join-Path $ProjectRoot "scripts\tools\w3strings-encode\Cargo.toml"
+    & cargo run --quiet --manifest-path $encoderManifest -- $csvFile.FullName $stringsOutput
+    if ($LASTEXITCODE -ne 0) {
+        throw "w3strings encode failed with exit code $LASTEXITCODE"
+    }
+}
+
 $packableFiles = Get-ChildItem -LiteralPath $sourceContent -Recurse -File | Where-Object {
-    $_.Name -ne ".gitkeep" -and $_.FullName -notlike (Join-Path $scriptSource "*")
+    $_.Name -ne ".gitkeep" `
+        -and $_.FullName -notlike (Join-Path $scriptSource "*") `
+        -and $_.Extension -ne ".csv" `
+        -and $_.Extension -ne ".w3strings"
 }
 
 if ($packableFiles.Count -eq 0) {

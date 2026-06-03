@@ -1,0 +1,8 @@
+;meta[language=en]
+; id      |key(hex)|key(str)| text
+2135400000||panel_Mods|Mods
+2135400001||panel_PerfectDismantling|Perfect Dismantling
+2135400002||preset_Mods_PerfectDismantling|Perfect Dismantling
+2135400003||preset_value_PD_Default|Default
+2135400004||option_PD_Enabled|Enable Perfect Dismantling
+2135400005||option_PD_Debug|Debug Mode
