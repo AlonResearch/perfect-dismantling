@@ -1,12 +1,6 @@
 # Generated mod output
 /dist/
 
-# Extracted Witcher 3 game/DLC data. Do not publish proprietary game files.
-/uncooked/
-
-# Generated XML overrides are derived from local game files.
-/source/**/content/**/*.xml
-
 # Keep source tree placeholders if present.
 !/source/**/content/.gitkeep
 

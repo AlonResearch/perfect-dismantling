@@ -16,15 +16,29 @@ if (!(Test-Path $sourceContent)) {
     throw "Missing source content folder: $sourceContent"
 }
 
-$xmlFiles = Get-ChildItem -LiteralPath $sourceContent -Recurse -Filter *.xml -File
-if ($xmlFiles.Count -eq 0) {
-    throw "No XML files found in $sourceContent. Use New-OverrideFile.ps1 first, then edit the copied XML."
+$sourceFiles = Get-ChildItem -LiteralPath $sourceContent -Recurse -File | Where-Object { $_.Name -ne ".gitkeep" }
+if ($sourceFiles.Count -eq 0) {
+    throw "No mod source files found in $sourceContent."
 }
 
 if (Test-Path $distMod) {
     Remove-Item -LiteralPath $distMod -Recurse -Force
 }
 New-Item -ItemType Directory -Force -Path $distContent | Out-Null
+
+$scriptSource = Join-Path $sourceContent "scripts"
+if (Test-Path $scriptSource) {
+    Copy-Item -LiteralPath $scriptSource -Destination $distContent -Recurse -Force
+}
+
+$packableFiles = Get-ChildItem -LiteralPath $sourceContent -Recurse -File | Where-Object {
+    $_.Name -ne ".gitkeep" -and $_.FullName -notlike (Join-Path $scriptSource "*")
+}
+
+if ($packableFiles.Count -eq 0) {
+    Write-Host "No bundle files found. Built loose-script mod at $distMod"
+    return
+}
 
 Push-Location $wccDir
 try {
