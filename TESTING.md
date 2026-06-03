@@ -145,7 +145,7 @@ Goal: confirm Witcher gear safety is stronger than normal fallback blocking.
 
 Expected result: the inferred previous-tier Witcher gear item is still returned. If the valid recipe or fallback output already includes that previous-tier item, it should appear only once.
 
-Regression case: in New Game+, Mastercrafted Feline armor pieces whose internal names use the `NGP Lynx ...` prefix should not show an empty dismantle output. If their NG+ recipe output is absent from `crafting_schematics`, the safety path should still return the previous `NGP Lynx ...` tier.
+Regression case: in New Game+, Mastercrafted Feline armor pieces whose internal names use the `NGP Lynx ...` prefix should not show an empty dismantle output. If the loaded recipe still uses the unprefixed `Lynx ...` crafted item, dismantling should use that live recipe and return the previous `NGP Lynx ...` tier. If no recipe can be resolved at all, the safety path should still return the previous `NGP Lynx ...` tier.
 
 ## 9. Build Output Check
 

@@ -26,6 +26,7 @@ The current build is a script mod that routes inventory dismantling through help
 
 - `RecycleItem()` calls `PerfectDismantling_GetDismantlingParts()` before removing the item.
 - Recipe lookup reads the loaded `crafting_schematics` custom definitions at runtime, scans for recipes whose `craftedItem_name` matches `GetItemName(id)`, and parses matched nodes into `SCraftingSchematic` data using the same fields as `W3CraftingManager.LoadSchematicsXMLData(...)`.
+- Exact recipe matches are preferred. If an installed mod changes a live item ID to an `NGP ...` name while the loaded recipe still crafts the unprefixed item, the resolver can bridge to that loaded recipe and rewrites returned ingredients to live `NGP ...` item IDs when those definitions exist.
 - Recipes with `craftedItemQuantity != 1` are rejected and fall back to vanilla recycling when Debug Mode is off.
 - If no recipe match is found, Debug Mode off falls back to `GetItemRecyclingParts()` for normal items; Debug Mode on treats normal missing recipes as strict failures and does not remove the item.
 - Socketed upgrades are appended by reading the dismantled item's enhancement list after recipe/fallback/Witcher safety output is selected.
